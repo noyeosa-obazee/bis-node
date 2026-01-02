@@ -1,26 +1,25 @@
-const http = require("node:http");
 const fs = require("fs");
+const express = require("express");
+const app = express();
+
+const PORT = 3000;
 
 const home = fs.readFileSync("index.html", "utf-8");
 const about = fs.readFileSync("about.html", "utf-8");
 const contactMe = fs.readFileSync("contact-me.html", "utf-8");
 const page404 = fs.readFileSync("404.html", "utf-8");
 
-http
-  .createServer(function (req, res) {
-    console.log("Request received for:", req.url);
-    if (req.url === "/") {
-      res.writeHead(200, { "Content-Type": "text/html" });
-      res.end(home);
-    } else if (req.url === "/about") {
-      res.writeHead(200, { "Content-Type": "text/html" });
-      res.end(about);
-    } else if (req.url === "/contact-me") {
-      res.writeHead(200, { "Content-Type": "text/html" });
-      res.end(contactMe);
-    } else {
-      res.writeHead(404, { "Content-Type": "text/html" });
-      res.end(page404);
-    }
-  })
-  .listen(8080, () => console.log("Server is running on port 8080"));
+app.get("/", (req, res) => res.send(home));
+app.get("/about", (req, res) => res.send(about));
+app.get("/contact-me", (req, res) => res.send(contactMe));
+app.use((req, res, next) => {
+  res.status(404).send(page404);
+});
+
+app.listen(PORT, (error) => {
+  if (error) {
+    throw error;
+  }
+
+  console.log(`Server listening now on port ${PORT}!`);
+});
